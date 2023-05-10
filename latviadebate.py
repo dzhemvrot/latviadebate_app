@@ -114,8 +114,8 @@ def load():
         f'{phot}'
     ]
         file_names = [
-        f'pages\{fn}.html',
-        f'images\{phot}'
+        f'{fn}.html',
+        f'{phot}'
     ]
         master_ref = repo.get_git_ref('heads/main')
         master_sha = master_ref.object.sha
@@ -126,8 +126,8 @@ def load():
             if entry.endswith('.html'):
                 with open(entry) as input_file:
                     data = input_file.read()
-            #if entry.endswith('.png'): # images must be encoded
-            #    data = base64.b64encode(data)
+            if entry.endswith('.png') or entry.endswith('.jpg') or entry.endswith('.webp'): # images must be encoded
+                data = base64.b64encode(data)
             element = InputGitTreeElement(file_names[i], '100644', 'blob', data)
             element_list.append(element)
         tree = repo.create_git_tree(element_list, base_tree)
