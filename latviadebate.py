@@ -12,7 +12,7 @@ root = Tk()
 root.option_add("*Font", "Verdana 10")
 
 user = 'dzhemvrot'
-token = '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'
+token = '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'
 commit_message = 'python commit'
 g = Github(token)
 repo = g.get_user().get_repo('latviadebate') # repo name
