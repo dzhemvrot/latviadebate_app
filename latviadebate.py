@@ -1,21 +1,15 @@
 import tkinter
 import tkinter.filedialog
-import base64
 import os
-from github import Github
-from github import InputGitTreeElement
+import webbrowser
+import requests
 from tkinter import *
 from tkinter import messagebox
+from os import getcwd
 from datetime import datetime, timedelta
 
 root = Tk()
 root.option_add("*Font", "Verdana 10")
-
-user = 'dzhemvrot'
-token = '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'
-commit_message = 'python commit'
-g = Github(token)
-repo = g.get_user().get_repo('latviadebate') # repo name
 
 
 #########################################################################
@@ -28,6 +22,13 @@ def load():
         artna = Name.get()
         regl = Regist.get()
         dienl = Dienas.get()
+        url="https://raw.githubusercontent.com/dzhemvrot/latviadebate/main/index.html?token=GHSAT0AAAAAACAAN6GPQB4EVMKDBGL6YICCZC4AG2A"
+        requests.get(url)
+        filename = getcwd() + '/index.html'
+        r = requests.get(url)
+        f = open(filename,'wt')
+        f.write(r.content)
+        phots = photo()
         whfi = """<!doctype html>
     <html lang="lv-LV">
             <head>
@@ -35,23 +36,23 @@ def load():
                     <meta name="viewport" content="width=device-width, initial-scale=1">
                     <meta name="keywords" content="">"""+f"""
                     <title>Latvia Debate — {artna}</title>"""+'''
-                    <link rel="icon" sizes="192x192" href="../images/logo.png">
+                    <link rel="icon" sizes="192x192" href="logo.png">
                     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous"> 
                     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
-                    <link rel="stylesheet" type="text/css" href="../style.css">
+                    <link rel="stylesheet" type="text/css" href="style.css">
             </head>
       
             <body>
                     <nav class="navbar navbar-light navbar-og navbar-expand-lg">
                       <div class="container-fluid">
-                            <a class="navbar-brand" href="../index.html"><img src="../images/shapka.png" alt="Latvia Debate logo" width="250" height="auto"></a>
+                            <a class="navbar-brand" href="index.html"><img src="shapka.png" alt="Latvia Debate logo" width="250" height="auto"></a>
                             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                               <span class="navbar-toggler-icon"></span>
                             </button>
                             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                               <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                                     <li class="nav-item">
-                                      <a class="nav-link" aria-current="page" href="../index.html">Galvenā</a>
+                                      <a class="nav-link" aria-current="page" href="index.html">Galvenā</a>
                                     </li>
                                     <li class="nav-item">
                                             <a class="nav-link" href="https://www.facebook.com/pg/LatviaDebate/photos">Foto</a>
@@ -69,7 +70,7 @@ def load():
             <p>{artic}"""+f"""
                <a href="{regl}">Reģistrācija</a>
                <br><a href="{dienl}">Dienas kartība</a></p>"""+"""<hr>
-               <img src="../images/{photo}" class="img-fluid rounded" width="800px" height="auto"><hr>
+           <img src="{phots}" class="img-fluid rounded" width="800px" height="auto"><hr>
             
                <div id="disqus_thread"></div>"""+"""
                <script>
@@ -106,38 +107,16 @@ def load():
             </body>
     </html>
     """
-        open(fn+".html", 'wt', encoding="utf-8").write(whfi)
-        phots = photo()
-        phot = os.path.basename(phots).split('/')[-1]
-        file_list = [
-        f'{fn}.html',
-        f'{phot}'
-    ]
-        file_names = [
-        f'{fn}.html',
-        f'{phot}'
-    ]
-        master_ref = repo.get_git_ref('heads/main')
-        master_sha = master_ref.object.sha
-        base_tree = repo.get_git_tree(master_sha)
+        open(fn+".html", "wt", encoding='utf-8').write(whfi)
+        webbrowser.open('https://github.com/dzhemvrot/latviadebate', new=2)
+        messagebox.showinfo("Успех!", "Статья сохранена!")
+    except Exception as e:
+        print(e)
+        messagebox.showerror("Ошибка!", f"Что-то пошло не так!\nПовторите попытку!\n\nОшибка: {e}\nСообщите ошибку создателю программы!")
 
-        element_list = list()
-        for i, entry in enumerate(file_list):
-            if entry.endswith('.html'):
-                with open(entry) as input_file:
-                    data = input_file.read()
-            if entry.endswith('.png') or entry.endswith('.jpg') or entry.endswith('.webp'): # images must be encoded
-                data = base64.b64encode(data)
-            element = InputGitTreeElement(file_names[i], '100644', 'blob', data)
-            element_list.append(element)
-        tree = repo.create_git_tree(element_list, base_tree)
-        parent = repo.get_git_commit(master_sha)
-        commit = repo.create_git_commit(commit_message, tree, [parent])
-        master_ref.edit(commit.sha)
-        os.remove(f"{fn}.html")
-        messagebox.showinfo("Успех!", "Статья успешно добавлена!")
-    except:
-        messagebox.showerror("Ошибка!", "Что-то пошло не так!\nПовторите попытку!")
+def on_closing():
+    if messagebox.askokcancel("Выход", "Вы точно хотите выйти?"):
+        root.destroy()
 
 def photo():
     ftypes = [('.PNG', '*.png'), ('.JPG', '*.jpg'), ('.WEBP', '*.webp'), ('All files', '*')] 
@@ -146,10 +125,6 @@ def photo():
         return
     print(photo)
     return photo
-
-def on_closing():
-    if messagebox.askokcancel("Выход", "Вы точно хотите выйти?"):
-        root.destroy()
     
 #########################################################################
 
@@ -158,7 +133,7 @@ root.config(menu=menubar)
 
 file_menu = Menu(menubar,tearoff=0)
 
-file_menu.add_command(label='Выложить', command = load)
+file_menu.add_command(label='Сохранить', command = load)
 file_menu.add_separator()
 
 file_menu.add_command(
@@ -175,7 +150,7 @@ menubar.add_command(label='О программе')
 
 #########################################################################
 
-Label = Label(root, text = "                     Название статьи:")
+Label = Label(root, text = "Название статьи:")
 Label.grid(row=0, column=1)
 
 Name = Entry(root)
@@ -196,7 +171,7 @@ Dienas.grid(row=2, column=4)
 ClearB = Button(root, text = "Очистить", width = 8)
 ClearB.grid(row = 3, column = 1, padx=20, pady=10)
 
-UplB = Button(root, text = "Выложить", width = 8, command = load)
+UplB = Button(root, text = "Сохранить", width = 8, command = load)
 UplB.grid(row = 3, column = 4, padx=20, pady=10)
 
 scrollbar = Scrollbar(root, orient='vertical', command=Text.yview)
