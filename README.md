@@ -1,1 +1,0 @@
-# latviadebate_app
