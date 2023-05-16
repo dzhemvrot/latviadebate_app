@@ -2,7 +2,6 @@ import tkinter
 import tkinter.filedialog
 import os
 import webbrowser
-import requests
 from tkinter import *
 from tkinter import messagebox
 from os import getcwd
@@ -17,18 +16,14 @@ root.option_add("*Font", "Verdana 10")
 def load():
     try:
         fn = datetime.now().strftime("%d-%m-%Y")
-        artic = Text.get('1.0', 'end')
+        artic = NText.get('1.0', 'end')
         artic = artic.replace("\n", "<br>")
         artna = Name.get()
         regl = Regist.get()
         dienl = Dienas.get()
-        url="https://raw.githubusercontent.com/dzhemvrot/latviadebate/main/index.html?token=GHSAT0AAAAAACAAN6GPQB4EVMKDBGL6YICCZC4AG2A"
-        requests.get(url)
-        filename = getcwd() + '/index.html'
-        r = requests.get(url)
-        f = open(filename,'wt')
-        f.write(r.content)
         phots = photo()
+        if phots is None:
+            return
         whfi = """<!doctype html>
     <html lang="lv-LV">
             <head>
@@ -118,6 +113,21 @@ def on_closing():
     if messagebox.askokcancel("Выход", "Вы точно хотите выйти?"):
         root.destroy()
 
+def helps():
+    win = Toplevel()
+    win.title('О программе')
+    message = """Программа создана Тимуром Бесарабом в 2023 году в рамках проекта по информатике (datorika).
+Все права защищены. Для получения дополнительной помощи нажмите на кнопку "Помощь"."""
+    HelpLab = Label(win, text=message)
+    HelpLab.grid(row=0, column=1)
+    HelpBut = Button(win, text='Помощь', command=helpweb)
+    HelpBut.grid(row=1, column=0)
+    ClBut = Button(win, text='Закрыть', command=win.destroy)
+    ClBut.grid(row=1, column=2)
+
+def helpweb():
+    webbrowser.open('https://github.com/dzhemvrot/latviadebate_app/blob/main/README.md', new=2)
+
 def photo():
     ftypes = [('.PNG', '*.png'), ('.JPG', '*.jpg'), ('.WEBP', '*.webp'), ('All files', '*')] 
     photo = tkinter.filedialog.Open(root, filetypes = ftypes).show()
@@ -146,18 +156,18 @@ menubar.add_cascade(
     menu=file_menu
 )
 
-menubar.add_command(label='О программе')
+menubar.add_command(label='О программе', command = helps)
 
 #########################################################################
 
-Label = Label(root, text = "Название статьи:")
-Label.grid(row=0, column=1)
+NLabel = Label(root, text = "Название статьи:")
+NLabel.grid(row=0, column=1)
 
 Name = Entry(root)
 Name.grid(row=0, column=2)
 
-Text = Text(root)
-Text.grid(row = 1, column = 0, columnspan = 5)
+NText = Text(root)
+NText.grid(row = 1, column = 0, columnspan = 5)
 
 Regist = Entry(root)
 Regist.grid(row=2, column=1)
@@ -177,7 +187,7 @@ UplB.grid(row = 3, column = 4, padx=20, pady=10)
 scrollbar = Scrollbar(root, orient='vertical', command=Text.yview)
 scrollbar.grid(row=1, column=5, sticky=NS)
 
-Text['yscrollcommand'] = scrollbar.set
+NText['yscrollcommand'] = scrollbar.set
 
 
 try:
