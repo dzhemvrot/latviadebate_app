@@ -117,7 +117,7 @@ def helps():
     win = Toplevel()
     win.title('О программе')
     message = """Программа создана Тимуром Бесарабом в 2023 году в рамках проекта по информатике (datorika).
-Все права защищены. Для получения дополнительной помощи нажмите на кнопку "Помощь"."""
+Для получения дополнительной информации нажмите на кнопку "Помощь"."""
     HelpLab = Label(win, text=message)
     HelpLab.grid(row=0, column=1)
     HelpBut = Button(win, text='Помощь', command=helpweb)
