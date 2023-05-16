@@ -124,6 +124,7 @@ def helps():
     HelpBut.grid(row=1, column=0)
     ClBut = Button(win, text='Закрыть', command=win.destroy)
     ClBut.grid(row=1, column=2)
+    win.resizable(False, False)
 
 def helpweb():
     webbrowser.open('https://github.com/dzhemvrot/latviadebate_app/blob/main/README.md', new=2)
